@@ -1,6 +1,6 @@
 #' A flexible upper-level wrapper for iterative modelling using any available fitting algorithm.
 #'
-#' @param fiting_fun A model fitting function like stats::lm, glmmTMB::glmmTMB, lme4::lmer
+#' @param fitting_fun A model fitting function like stats::lm, glmmTMB::glmmTMB, lme4::lmer
 #' @param arguments A list of arguments to be passed to the fitting function, this should not contain data. Note that the formula must have y as the dependent variable.
 #' @param data A data frame with targets (i.e. genes, transcripts) as rows and sample names as colums.
 #' The first column is assumed to contain target names/identification
@@ -26,9 +26,9 @@ seqwrap <- function(fitting_fun = glmmTMB::glmmTMB,
                         summary_fun = NULL,
                         eval_fun = NULL,
                         exported = list(),
-                    return_models = TRUE,
-                        save_mods = TRUE,
-                        mod_path = NULL,
+                        return_models = TRUE,
+                        save_models = FALSE,
+                        model_path = NULL,
                         subset = NULL,
                         cores) {
 
@@ -43,10 +43,10 @@ seqwrap <- function(fitting_fun = glmmTMB::glmmTMB,
   ## Sanity checks
 
   # checks if arguments for the provided fitting function matches arguments
-  stopifnot("arguments do not match named argumenst of the selected \nmodel fitting function (fitting_fun)." = names(arguments) %in% names(formals(glmmTMB::glmmTMB)) )
+  stopifnot("Arguments do not match named arguments of the selected \nmodel fitting function (fitting_fun)." = names(arguments) %in% names(formals(glmmTMB::glmmTMB)) )
 
   # Check if the data has a character vector for first column (indicating transcript id).
-  stopifnot("The first column of the data is not character or factor, check if this column indicate target identifications." = is.character(data[,1]))
+  stopifnot("The first column of the data is not character or factor,\ncheck if this column indicate target identifications." = is.character(data[,1]))
 
   # Check if the sample name is present in the meta data
   stopifnot("The samplename does not exist in the metadata,\nno variable for matching metadata and data." = samplename %in% colnames(metadata))
@@ -57,8 +57,8 @@ seqwrap <- function(fitting_fun = glmmTMB::glmmTMB,
   }
 
 
-  # Using create_lists function to create a list of data frames for each target
-  dfs <- create_lists(data)
+  # Split the data into a list of data frames for each target
+  dfs <- split(data[,1:ncol(data)], data[,1])
 
 
   ### Fitting models in parallel #######
@@ -72,13 +72,18 @@ seqwrap <- function(fitting_fun = glmmTMB::glmmTMB,
   # Create a cluster using the number of cores specified
   cl <- parallel::makeCluster(num_cores)
 
+
+
   ## Export data to clusters
   parallel::clusterExport(cl, varlist = c("metadata",
                                           "arguments",
-                                          "fit_fun",
+                                          "fitting_fun",
                                           "samplename",
                                           "additional_vars",
                                           "fitting_fun",
+                                          "save_models",
+                                          "exported",
+                                          "model_path",
                                           "return_models",
                                           "summary_fun",
                                           "eval_fun"),
@@ -88,17 +93,42 @@ seqwrap <- function(fitting_fun = glmmTMB::glmmTMB,
 
   # Parallel execution of the fitting process
   cat("Transforming, merging and modelling data.\n")
-  model_fits <- pbapply::pblapply(cl = cl, X = dfs, FUN = seqwrap:::transform_merge_fit)
-
+  results <- pbapply::pblapply(cl = cl, X = dfs, FUN = merge_transform_fit)
 
   parallel::stopCluster(cl)
 
-  ## Store results in a list
-  results <- list(model_fits = model_fits)
 
 
-  return(results)
 
+  # Return results
+
+  models <- NULL
+  summaries <- NULL
+  evaluations <- NULL
+  errors <- NULL
+
+  # Collect models
+  if(return_models) models <- lapply(results, `[[`, "model")
+
+  if(!is.null(summary_fun)) summaries <-  lapply(results, `[[`, "summaries")
+  if(!is.null(eval_fun)) evaluations <- lapply(results, `[[`, "evaluation")
+
+  ## Create a data frame of all errors/warnings
+  tibble::tibble(target = names(results),
+                 errors_fit = lapply(results, `[[`, "err"),
+                 warnings_fit = lapply(results, `[[`, "warn"),
+                 err_sum = lapply(results, `[[`, "err_sum"),
+                 warn_sum = lapply(results, `[[`, "warn_sum"),
+                 err_eval = lapply(results, `[[`, "err_eval"),
+                 warn_eval = lapply(results, `[[`, "warn_eval")) -> errors
+
+  comb_results <- list(models = models,
+                       summaries = summaries,
+                       evaluations = evaluations,
+                       errors = errors)
+
+
+  return(comb_results)
 
 
 }

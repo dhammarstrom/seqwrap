@@ -39,8 +39,8 @@ merge_transform_fit <- function(x,
                             mt_eval_fun = eval_fun,
                             ffun = fitting_fun,
                             return_mod = return_models,
-                            save_mods = save_mods,
-                            mod_path = mod_path) {
+                            save_mods = save_models,
+                            mod_path = model_path) {
 
 
   transposed <- data.frame(seq_sample_id = rownames(t(x[,-1])),
@@ -74,14 +74,20 @@ merge_transform_fit <- function(x,
   # Add warning/errors to outputs
   warn <- NULL
   err <- NULL
+  warn_sum <- NULL
+  warn_eval <- NULL
+  err_sum <- NULL
+  err_eval <- NULL
+
+  # Adding null values to model outputs
   mod <- NULL
-  # Adding null values to outputs
+  # Adding null values to outputs from summaries and evaluations
   mod_sum <- NULL
   mod_eval <- NULL
 
   ## Fit the model
   tryCatch(
-    mod <- seqwrap:::fit_fun(ffun, arguments_final),
+    mod <- fit_fun(ffun, arguments_final),
 
     warning = function(w) warn <<- w,
     error = function(e) err <<- e
@@ -91,10 +97,10 @@ merge_transform_fit <- function(x,
   if(!is.null(mt_summary_fun)) {
 
     tryCatch(
-      mod_sum <- do.call("mt_summary_fun", list(x = mod)),
+      mod_sum <- do.call("mt_summary_fun", list(mod)),
 
-      warning = function(w) warn_mod <<- w,
-      error = function(e) err_mod <<- e
+      warning = function(w) warn_sum <<- w,
+      error = function(e) err_sum <<- e
     )
   }
 
@@ -102,21 +108,38 @@ merge_transform_fit <- function(x,
   if(!is.null(mt_eval_fun)) {
 
     tryCatch(
-      mod_sum <- do.call("mt_eval_fun", list(x = mod)),
+      mod_eval <- do.call("mt_eval_fun", list(mod)),
 
       warning = function(w) warn_eval <<- w,
       error = function(e) err_eval <<- e
     )
   }
 
+
+  # Save the model if requested
   mod_path <- if(!is.null(mod_path)) mod_path else paste0(getwd(), "/seqwrap-output")
   if(save_mods) saveRDS(mod, file = paste0(mod_path, "/", names(x), ".rds"))
 
   # Return the model if requested
   if(return_mod) {
-    return(list(model = mod, summaries = mod_sum, evaluation = mod_eval, warn = warn, err = err))
+    return(list(model = mod,
+                summaries = mod_sum,
+                evaluation = mod_eval,
+                warn = warn,
+                err = err,
+                warn_sum = warn_sum,
+                warn_eval = warn_eval,
+                err_sum = err_sum,
+                err_eval = err_eval))
   } else {
-    return(list(summaries = mod_sum, evaluation = mod_eval, warn = warn, err = err))
+    return(list(summaries = mod_sum,
+                evaluation = mod_eval,
+                warn = warn,
+                err = err,
+                warn_sum = warn_sum,
+                warn_eval = warn_eval,
+                err_sum = err_sum,
+                err_eval = err_eval))
   }
 
 
