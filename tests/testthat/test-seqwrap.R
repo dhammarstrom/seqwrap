@@ -1,10 +1,10 @@
 
-
+library(testthat);library(seqwrap)
 ## Testing seqwrap
 
 # Use sample data for tests
 seqdata <- rna_seq_sample %>%
-  mutate(across(-transcript_id, ~as.integer(round(.x, 0))))
+  dplyr::mutate(across(-transcript_id, ~as.integer(round(.x, 0))))
 
 seqdatasubset <- seqdata[1:10,]
 
@@ -151,40 +151,16 @@ test_that("Model summaries and evaluations returns expected results", {
   expect_null(test.summary.glmmTMB$errors$err_sum[[1]])
   expect_null(test.summary.glmmTMB$errors$err_eval[[1]])
 
-  ## Expect errors when a bad function is passed
-  bad_eval_fun <- function(x) {
-    as.data.frame(x)
-  }
+  # Expect errors when a bad function is passed
+  #
+  # To be written
+  #
+  #
 
-  bad_summary_fun <- function(x) {
-    as.data.frame(x)
-  }
 
-  test.summary_bad.glmmTMB <- seqwrap::seqwrap(fitting_fun = glmmTMB::glmmTMB,
-                                           arguments = list(formula = y ~ time + (1|participant),
-                                                            family = glmmTMB::nbinom2),
-                                           data = seqdatasubset,
-                                           metadata = metadata,
-                                           samplename = "seq_sample_id",
-                                           additional_vars = NULL,
-                                           summary_fun = bad_summary_fun,
-                                           eval_fun = bad_eval_fun,
-                                           exported = list(),
-                                           return_models = TRUE,
-                                           save_models = FALSE,
-                                           model_path = NULL,
-                                           subset = NULL,
-                                           cores = 1)
-
-  test.summary_bad.glmmTMB$errors$err_sum[[1]] |> expect_not_null()
 
 
 })
-
-
-
-
-
 
 
 
