@@ -1,6 +1,5 @@
-
-
-#' A small (sample) RNA-seq data set used for illustrations in the vignette and testing.
+#' A small (sample) RNA-seq data set used for illustrations
+#' in the vignette and testing.
 #'
 #'
 #' @format ## `rna_seq_sample`
@@ -18,7 +17,8 @@
 
 
 
-#' Metadata to match the small RNA-seq data set used for illustrations in the vignette and testing.
+#' Metadata to match the small RNA-seq data set used for illustrations
+#' in the vignette and testing.
 #'
 #' @format A data frame with 268 rows and 10 variables:
 #' \describe{
@@ -32,8 +32,6 @@
 #'   \item{sample.weight}{Sample wet weight (mg)}
 #'   \item{total.rna}{Total amount of RNA (ng)}
 #'   \item{rqi}{RNA quality indicator}
-#'   \item{seq_sample_id}{Sample ID in datasets downloaded with the function download_ome()}}
+#'   \item{seq_sample_id}{Sample ID in datasets downloaded with
+#'   the function download_ome()}}
 "rna_seq_metadata"
-
-
-

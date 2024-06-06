@@ -3,11 +3,11 @@ Type: Package
 Title: Item-by-item Iterative Model Fitting
 Version: 0.1.0
 Authors@R: 
-    person("Daniel", "Hammarström", 
+    person("Daniel", "Hammarstrom", 
     email = "daniel.hammarstrom@inn.no", 
     role = c("aut", "cre"), 
     comment = c(ORCID = "0000-0001-8360-2100"))
-Description: Model high dimensional data using an item-by-item strategy with a specific model engine.
+Description: Model high dimensional data using an item-by-item strategy.
 License: use_gpl_license()
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -15,10 +15,16 @@ LazyData: true
 URL: https://github.com/dhammarstrom/seqwrap
 BugReports: https://github.com/dhammarstrom/seqwrap/issues
 Imports:
+    tibble,
     pbapply,
-    parallel,
-    DiagrammeR
+    parallel
 Suggests: 
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    DiagrammeR,
+    dplyr,
+    knitr,
+    DHARMa, 
+    glmmTMB,
+    lme4
 Config/testthat/edition: 3
 RoxygenNote: 7.3.1

@@ -3,7 +3,8 @@
 \docType{data}
 \name{rna_seq_sample}
 \alias{rna_seq_sample}
-\title{A small (sample) RNA-seq data set used for illustrations in the vignette and testing.}
+\title{A small (sample) RNA-seq data set used for illustrations
+in the vignette and testing.}
 \format{
 \subsection{\code{rna_seq_sample}}{
 
@@ -18,6 +19,7 @@ A data frame with 1000 rows and 197 columns
 rna_seq_sample
 }
 \description{
-A small (sample) RNA-seq data set used for illustrations in the vignette and testing.
+A small (sample) RNA-seq data set used for illustrations
+in the vignette and testing.
 }
 \keyword{datasets}

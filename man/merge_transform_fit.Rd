@@ -2,26 +2,27 @@
 % Please edit documentation in R/merge_transform_fit.R
 \name{merge_transform_fit}
 \alias{merge_transform_fit}
-\title{Transform, merge and fit models. The function is used inside seq_wrapper to combine
-metadata with target-level data and perform the model fitting. The function is used in a
-call to pbapply::pblapply.}
+\title{Transform, merge and fit models. The function is used inside seq_wrapper
+to combine metadata with target-level data and perform the model fitting.
+The function is used in a call to pbapply::pblapply.}
 \usage{
 merge_transform_fit(
   x,
-  samp_name = samplename,
-  metdat = metadata,
-  arg_list = arguments,
-  add_vars = additional_vars,
-  mt_summary_fun = summary_fun,
-  mt_eval_fun = eval_fun,
-  ffun = fitting_fun,
-  return_mod = return_models,
-  save_mods = save_models,
-  mod_path = model_path
+  samp_name,
+  metdat,
+  arg_list,
+  add_vars,
+  mt_summary_fun,
+  mt_eval_fun,
+  ffun,
+  return_mod,
+  save_mods,
+  mod_path
 )
 }
 \arguments{
-\item{x}{A data frame of target-specific quantities, in seqwrap a list from create_list is used iteratively.}
+\item{x}{A data frame of target-specific quantities, in seqwrap a list
+from create_list is used iteratively.}
 
 \item{samp_name}{Sample names from the upper level function}
 
@@ -45,7 +46,7 @@ merge_transform_fit(
 _mod Logical, should the models be returned as part of the results?
 }
 \description{
-Transform, merge and fit models. The function is used inside seq_wrapper to combine
-metadata with target-level data and perform the model fitting. The function is used in a
-call to pbapply::pblapply.
+Transform, merge and fit models. The function is used inside seq_wrapper
+to combine metadata with target-level data and perform the model fitting.
+The function is used in a call to pbapply::pblapply.
 }

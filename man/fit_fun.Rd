@@ -2,15 +2,15 @@
 % Please edit documentation in R/merge_transform_fit.R
 \name{fit_fun}
 \alias{fit_fun}
-\title{A function to fit models with a chosen fitting algorithm. To be used in seqwrap.}
+\title{A function to fit models with a chosen fitting algorithm, used in seqwrap.}
 \usage{
-fit_fun(FUN, ARG)
+fit_fun(fun, arg)
 }
 \arguments{
-\item{FUN}{Name of a fitting function, like glmmTMB::glmmTMB}
+\item{fun}{Name of a fitting function, like glmmTMB::glmmTMB}
 
-\item{ARG}{A list of arguments that can be evaluated by the fitting function}
+\item{arg}{A list of arguments that can be evaluated by the fitting function}
 }
 \description{
-A function to fit models with a chosen fitting algorithm. To be used in seqwrap.
+A function to fit models with a chosen fitting algorithm, used in seqwrap.
 }

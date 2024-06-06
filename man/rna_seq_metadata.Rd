@@ -3,7 +3,8 @@
 \docType{data}
 \name{rna_seq_metadata}
 \alias{rna_seq_metadata}
-\title{Metadata to match the small RNA-seq data set used for illustrations in the vignette and testing.}
+\title{Metadata to match the small RNA-seq data set used for illustrations
+in the vignette and testing.}
 \format{
 A data frame with 268 rows and 10 variables:
 \describe{
@@ -17,12 +18,14 @@ A data frame with 268 rows and 10 variables:
 \item{sample.weight}{Sample wet weight (mg)}
 \item{total.rna}{Total amount of RNA (ng)}
 \item{rqi}{RNA quality indicator}
-\item{seq_sample_id}{Sample ID in datasets downloaded with the function download_ome()}}
+\item{seq_sample_id}{Sample ID in datasets downloaded with
+the function download_ome()}}
 }
 \usage{
 rna_seq_metadata
 }
 \description{
-Metadata to match the small RNA-seq data set used for illustrations in the vignette and testing.
+Metadata to match the small RNA-seq data set used for illustrations
+in the vignette and testing.
 }
 \keyword{datasets}

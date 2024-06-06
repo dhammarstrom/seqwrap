@@ -1,0 +1,13 @@
+# README: seqwrap - Item-by-item Iterative Model Fitting
+
+
+seqwrap is an R package that allows you to model high dimensional data
+using an item-by-item strategy with a specific model engine. Using
+seqwrap you can fit e.g. gene/transcript data from an RNA-seq experiment
+to a model specified with random effects or custom distributions. This
+is possible as seqwrap efficiently iterates over all item (e.g. genes)
+and fits them to the same model formulation using any implemented model
+fitting algorithm in R. The package also provides pre- and post-fitting
+convenience functions. We show how to implement custom models to
+commonly analysed data and how pre- and post-fitting processing can be
+used to share information across independent models.

@@ -1,9 +1,8 @@
-
 # A small RNA-seq data set used for illustrations in the vignette and testing.
 #
 
 ## Using trainomeMetaData
-library(trainomeMetaData); library(tidyverse)
+# library(trainomeMetaData); library(tidyverse)
 
 ## A complete data se
 # compl_data <- read_csv("ome-data/vol_transcript_rsem.csv")
