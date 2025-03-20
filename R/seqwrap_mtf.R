@@ -11,8 +11,9 @@ fit_fun <- function(fun, arg) {
 }
 
 
-#' Transform, merge and fit models. The function is used inside seq_wrapper
-#' to combine metadata with target-level data and perform the model fitting.
+#' Transforma and merge data and fit models. The function is used inside
+#' seq_wrapper to combine metadata with target-level data and perform the
+#' model fitting.
 #' The function is used in a call to pbapply::pblapply.
 #' @param x A data frame of target-specific quantities, in seqwrap a list
 #' from create_list is used iteratively.
@@ -27,7 +28,7 @@ fit_fun <- function(fun, arg) {
 #' @param mod_path Path to save the models
 #' @param ffun the fitting function from the upper level function
 #' @keywords internal
-merge_transform_fit <- function(
+seqwrap_mtf <- function(
   x,
   samp_name,
   metdat,

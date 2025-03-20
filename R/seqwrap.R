@@ -256,7 +256,7 @@ seqwrap <- function(
   results <- pbapply::pblapply(
     cl = cl,
     X = dfs,
-    FUN = merge_transform_fit,
+    FUN = seqwrap_mtf,
     samp_name = samplename,
     metdat = metadata,
     arg_list = arguments,

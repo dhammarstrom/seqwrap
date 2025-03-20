@@ -36,5 +36,5 @@ Collate:
     'aaa-.R'
     'data-helper.R'
     'data.R'
-    'merge_transform_fit.R'
     'seqwrap.R'
+    'seqwrap_mtf.R'
