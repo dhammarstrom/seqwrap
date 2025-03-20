@@ -6,6 +6,16 @@ null_or_list <- S7::new_property(
   }
 )
 
+# Define a custom property type that accepts either data frame or a list
+df_or_list <- S7::new_property(
+  # The validator function checks if the value is NULL or a list
+  validator = function(value) {
+    if (!(is.data.frame(value) || is.list(value))) {
+      "must be a data frame or a list"
+    }
+  }
+)
+
 
 #' @export
 seqwrapResults <- S7::new_class(
@@ -20,6 +30,24 @@ seqwrapResults <- S7::new_class(
     k = S7::class_numeric,
     call_arguments = S7::class_character,
     call_engine = S7::class_character
+  )
+)
+
+
+#' @export
+swcontainer <- S7::new_class(
+  name = "swcontainer",
+  parent = S7::class_list,
+  properties = list(
+    fitting_fun = S7::class_function,
+    arguments = null_or_list,
+    data = df_or_list,
+    metadata = S7::class_data.frame,
+    samplename = S7::class_character,
+    additional_vars = S7::class_character,
+    summary_fun = S7::class_function,
+    eval_fun = S7::class_function,
+    exported = S7::class_list
   )
 )
 
@@ -74,9 +102,14 @@ S7::method(print, seqwrapResults) <- function(x) {
 }
 
 
-#' A flexible upper-level wrapper for iterative modelling using any available
-#' fitting algorithm.
+#' Compose a swcontainer object for use in the seqwrap function.
 #'
+#' This function makes it possible to run checks on combined data sets
+#' (meta data and target data) and fitting functions to avoid issues
+#' in iterative modelling.
+#'
+#' @param x An optional named list or DGEList object (DESeqDataSet not yet
+#' implemented).
 #' @param fitting_fun A model fitting function like stats::lm,
 #' glmmTMB::glmmTMB, lme4::lmer
 #' @param arguments An alist or list of arguments to be passed to the fitting
@@ -110,6 +143,72 @@ S7::method(print, seqwrapResults) <- function(x) {
 #' @param exported A list of functions, values etc. to be passed to
 #' summary_fun and eval_fun. This list must contain any functions that
 #' should be used in model summarise or evaluations.
+#' @return A swcontainer object for direct use in seqwrap.
+#' @export
+seqwrap_compose <- function(
+  x,
+  fitting_fun,
+  arguments,
+  data,
+  metadata,
+  samplename = "seq_sample_id",
+  additional_vars = NULL,
+  summary_fun = NULL,
+  eval_fun = NULL,
+  exported = list()
+) {
+  if (class(x) == "DGEList") {
+    # Prepare count data from DGEList
+
+    # If gene annotations are not available, use rownames
+    if (is.null(x$genes)) {
+      # If row names are numbers (1:nrow) add "target" for readability
+      if (identical(rownames(x), as.character(1:nrow(x$counts)))) {
+        xdata <- data.frame(
+          target = paste0("target", 1:nrow(x$counts)),
+          x$count
+        )
+        # Change name on sample names if provided
+        if (!is.null(samplename)) colnames(xdata)[1] <- samplename
+      } else {
+        xdata <- data.frame(target = rownames(x$counts), x$count)
+        # Change name on sample names if provided
+        if (!is.null(samplename)) colnames(xdata)[1] <- samplename
+      }
+    }
+    # If gene annotations are available, use these as identifiers
+    if (!is.null(x$genes)) {
+      xdata <- data.frame(target = x$genes[, 1], x$count)
+      if (!is.null(samplename)) colnames(xdata)[1] <- samplename
+    }
+
+    # Prepare metadata from DGEList
+
+    xmetadata <- data.frame(
+      samplename = rownames(x$samples),
+      x$samples,
+      row.names = NULL
+    )
+    if (!is.null(samplename)) colnames(xmetadata)[1] <- samplename
+
+    # Prepare gene-wise dispersion data
+
+    container <- swcontainer(
+      data = data_helper(data.frame(x$counts))
+    )
+  }
+
+  container <- swcontainer()
+}
+
+
+#' A flexible upper-level wrapper for iterative modelling using any available
+#' fitting algorithm.
+#'
+#'
+#' @inheritParams seqwrap_compose
+#' @param y, An swcontainer object created with seqwrap_compose, a named list
+#' or a DGEList object.
 #' @param return_models Logical, should models be returned as part of the
 #' output? Save models during development on subsets of the data.
 #' If used on large data sets, this will result in large memory usage.
@@ -127,10 +226,11 @@ S7::method(print, seqwrapResults) <- function(x) {
 #' function; evaluations, a list of diagnostics created from eval_fun.
 #' @details This function provides a flexible wrapper to fit, summarize and
 #' evaluate statistical models fitted to high dimensional omics-type data.
-#' Models are fitted and passed to user defined functions to summarise and
+#' Models are fitted and passed to user defined functions to summarize and
 #' evaluate models.
 #' @export
 seqwrap <- function(
+  y,
   fitting_fun,
   arguments,
   data,
