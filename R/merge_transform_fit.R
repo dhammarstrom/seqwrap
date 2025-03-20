@@ -1,6 +1,7 @@
 #' A function to fit models with a chosen fitting algorithm, used in seqwrap.
 #' @param fun Name of a fitting function, like glmmTMB::glmmTMB
 #' @param arg A list of arguments that can be evaluated by the fitting function
+#' @keywords internal
 fit_fun <- function(fun, arg) {
   # Fit the model using the selected machinery and available arguments
   fittedmodel <- do.call(fun, arg)
@@ -25,23 +26,24 @@ fit_fun <- function(fun, arg) {
 #' @param save_mods Logical, should the models be saved?
 #' @param mod_path Path to save the models
 #' @param ffun the fitting function from the upper level function
-merge_transform_fit <- function(x,
-                                samp_name,
-                                metdat,
-                                arg_list,
-                                add_vars,
-                                mt_summary_fun,
-                                mt_eval_fun,
-                                ffun,
-                                return_mod,
-                                save_mods,
-                                mod_path) {
-  transposed <- data.frame(
-    seq_sample_id = rownames(t(x[, -1])),
-    y = as.vector(t(x[, -1]))
-  )
-
-  colnames(transposed)[1] <- samp_name
+#' @keywords internal
+merge_transform_fit <- function(
+  x,
+  samp_name,
+  metdat,
+  arg_list,
+  add_vars,
+  mt_summary_fun,
+  mt_eval_fun,
+  ffun,
+  return_mod,
+  save_mods,
+  mod_path
+) {
+  transposed <- data.frame(t(x))
+  transposed$temp <- rownames(transposed)
+  colnames(transposed)[ncol(transposed)] <- samp_name
+  rownames(transposed) <- NULL
 
   df <- merge(transposed, data.frame(metdat), by = samp_name)
 
@@ -62,9 +64,7 @@ merge_transform_fit <- function(x,
   ## Keep also additional variables that exists in the meta data data set
   if (!is.null(add_vars)) parsed <- c(parsed, add_vars)
 
-
   df <- df[, parsed, drop = FALSE]
-
 
   # Remove attributes from the list of arguments
   # (this solves an issue when using glmmTMB)
@@ -114,7 +114,6 @@ merge_transform_fit <- function(x,
       error = function(e) err_eval <<- e
     )
   }
-
 
   # Save the model if requested
   mod_path <- if (!is.null(mod_path)) {

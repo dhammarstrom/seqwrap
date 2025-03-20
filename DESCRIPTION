@@ -15,9 +15,12 @@ LazyData: true
 URL: https://github.com/dhammarstrom/seqwrap
 BugReports: https://github.com/dhammarstrom/seqwrap/issues
 Imports:
+    cli,
+    S7,
     tibble,
     pbapply,
-    parallel
+    parallel,
+    stats
 Suggests: 
     testthat (>= 3.0.0),
     DiagrammeR,
@@ -27,4 +30,11 @@ Suggests:
     glmmTMB,
     lme4
 Config/testthat/edition: 3
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
+Collate: 
+    'seqwrap-global.R'
+    'aaa-.R'
+    'data-helper.R'
+    'data.R'
+    'merge_transform_fit.R'
+    'seqwrap.R'

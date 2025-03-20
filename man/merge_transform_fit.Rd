@@ -50,3 +50,4 @@ Transform, merge and fit models. The function is used inside seq_wrapper
 to combine metadata with target-level data and perform the model fitting.
 The function is used in a call to pbapply::pblapply.
 }
+\keyword{internal}

@@ -26,13 +26,17 @@ seqwrap(
 \item{fitting_fun}{A model fitting function like stats::lm,
 glmmTMB::glmmTMB, lme4::lmer}
 
-\item{arguments}{A list of arguments to be passed to the fitting function,
-this should not contain data. Note that the formula must have y as the
-dependent variable.}
+\item{arguments}{An alist or list of arguments to be passed to the fitting
+function, this should not contain data. Note that the formula must have
+y as the dependent variable.}
 
-\item{data}{A data frame with targets (i.e. genes, transcripts) as rows and
-sample names as colums.
-The first column is assumed to contain target names/identification}
+\item{data}{A data frame or a list of data frames with targets (e.g. genes,
+transcripts) as rows and sample names as columns.
+If rownames = FALSE (default), each data frame should have target
+identifications as the first column in the data frame(s). If rownames = TRUE
+row names will be converted to target identifications. If data is provided as
+a list, each element of the list should be named. The corresponding names
+be available as variables for the fitting function.}
 
 \item{metadata}{A data frame with sample names (corresponding to column
 names in the target matrix)
@@ -75,6 +79,9 @@ subset of targets. If keft to the default (NULL), all rows will be used.}
 \item{cores}{An integer indicating the number of cores to be used in parallel
 computations. If NULL, a sequential for loop is used. If "max", all
 available cores are used.}
+
+\item{rownames}{should row names in data be used as target identifications?
+Defaults to FALSE.}
 }
 \value{
 A nested list with three upper levels slots: models, a list of

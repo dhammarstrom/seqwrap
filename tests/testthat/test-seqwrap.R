@@ -3,128 +3,110 @@ library(testthat)
 library(seqwrap)
 
 
-## Testing seqwrap #####
-
-# Use sample data for tests
-seqdata <- rna_seq_sample %>%
-  dplyr::mutate(across(-transcript_id, ~ as.integer(round(.x, 0))))
-
-seqdatasubset <- seqdata[1:10, ]
-
-metadata <- rna_seq_metadata |>
-  dplyr::filter(!is.na(seq_sample_id))
-
 test_that("seqwrap returns a list of models in the model
           slot when asked to return models", {
-            test_glmmtmb <- seqwrap::seqwrap(
-              fitting_fun = glmmTMB::glmmTMB,
-              arguments =
-                list(
-                  formula = y ~ time +
-                    (1 | participant),
-                  family = glmmTMB::nbinom2
-                ),
-              data = seqdatasubset,
-              metadata = metadata,
-              samplename = "seq_sample_id",
-              additional_vars = NULL,
-              summary_fun = NULL,
-              eval_fun = NULL,
-              exported = list(),
-              return_models = TRUE,
-              save_models = FALSE,
-              model_path = NULL,
-              subset = NULL,
-              cores = 1
-            )
+  test_glmmtmb <- seqwrap::seqwrap(
+    fitting_fun = glmmTMB::glmmTMB,
+    arguments = list(
+      formula = y ~
+        time +
+          (1 | participant),
+      family = glmmTMB::nbinom2
+    ),
+    data = seqdatasubset,
+    metadata = metadata,
+    samplename = "seq_sample_id",
+    additional_vars = NULL,
+    summary_fun = NULL,
+    eval_fun = NULL,
+    exported = list(),
+    return_models = TRUE,
+    save_models = FALSE,
+    model_path = NULL,
+    subset = NULL,
+    cores = 1
+  )
 
-            expect_s3_class(test_glmmtmb$models[[1]], "glmmTMB")
+  expect_s3_class(test_glmmtmb@models[[1]], "glmmTMB")
 
-            test_glmnb <- seqwrap::seqwrap(
-              fitting_fun = MASS::glm.nb,
-              arguments = list(formula = y ~ time),
-              data = seqdatasubset,
-              metadata = metadata,
-              samplename = "seq_sample_id",
-              additional_vars = NULL,
-              summary_fun = NULL,
-              eval_fun = NULL,
-              exported = list(),
-              return_models = TRUE,
-              save_models = FALSE,
-              model_path = NULL,
-              subset = NULL,
-              cores = 1
-            )
+  test_glmnb <- seqwrap::seqwrap(
+    fitting_fun = MASS::glm.nb,
+    arguments = list(formula = y ~ time),
+    data = seqdatasubset,
+    metadata = metadata,
+    samplename = "seq_sample_id",
+    additional_vars = NULL,
+    summary_fun = NULL,
+    eval_fun = NULL,
+    exported = list(),
+    return_models = TRUE,
+    save_models = FALSE,
+    model_path = NULL,
+    subset = NULL,
+    cores = 1
+  )
 
+  expect_s3_class(test_glmnb@models[[1]], c("glm", "lm", "negbin"))
 
-            expect_s3_class(test_glmnb$models[[1]], c("glm", "lm", "negbin"))
+  test_lm <- seqwrap::seqwrap(
+    fitting_fun = stats::lm,
+    arguments = list(formula = y ~ time),
+    data = seqdatasubset,
+    metadata = metadata,
+    samplename = "seq_sample_id",
+    additional_vars = NULL,
+    summary_fun = NULL,
+    eval_fun = NULL,
+    exported = list(),
+    return_models = TRUE,
+    save_models = FALSE,
+    model_path = NULL,
+    subset = NULL,
+    cores = 1
+  )
 
-            test_lm <- seqwrap::seqwrap(
-              fitting_fun = stats::lm,
-              arguments = list(formula = y ~ time),
-              data = seqdatasubset,
-              metadata = metadata,
-              samplename = "seq_sample_id",
-              additional_vars = NULL,
-              summary_fun = NULL,
-              eval_fun = NULL,
-              exported = list(),
-              return_models = TRUE,
-              save_models = FALSE,
-              model_path = NULL,
-              subset = NULL,
-              cores = 1
-            )
+  expect_s3_class(test_lm@models[[1]], "lm")
 
-            expect_s3_class(test_lm$models[[1]], "lm")
+  test_glm <- seqwrap::seqwrap(
+    fitting_fun = stats::glm,
+    arguments = list(
+      formula = y ~ time,
+      family = poisson(link = "log")
+    ),
+    data = seqdatasubset,
+    metadata = metadata,
+    samplename = "seq_sample_id",
+    additional_vars = NULL,
+    summary_fun = NULL,
+    eval_fun = NULL,
+    exported = list(),
+    return_models = TRUE,
+    save_models = FALSE,
+    model_path = NULL,
+    subset = NULL,
+    cores = 1
+  )
 
-            test_glm <- seqwrap::seqwrap(
-              fitting_fun = stats::glm,
-              arguments =
-                list(
-                  formula = y ~ time,
-                  family = poisson(link = "log")
-                ),
-              data = seqdatasubset,
-              metadata = metadata,
-              samplename = "seq_sample_id",
-              additional_vars = NULL,
-              summary_fun = NULL,
-              eval_fun = NULL,
-              exported = list(),
-              return_models = TRUE,
-              save_models = FALSE,
-              model_path = NULL,
-              subset = NULL,
-              cores = 1
-            )
-
-            expect_s3_class(test_glm$models[[1]], "glm")
-          })
+  expect_s3_class(test_glm@models[[1]], "glm")
+})
 
 
-
-### Model evaluations
 test_that("Model summaries and evaluations returns expected results", {
   ## Create a model summary function
   summaryfun_glmmtmb <- function(x) {
     # Extract conditional effects and store as a tibble
-    results <- tibble::as_tibble(coef(summary(x))$cond,
-      rownames = "coef"
-    ) |>
-      dplyr::select(coef,
+    results <- tibble::as_tibble(coef(summary(x))$cond, rownames = "coef") |>
+      dplyr::select(
+        coef,
         estimate = Estimate,
         se = "Std. Error",
         z = "z value",
         p = "Pr(>|z|)"
       )
 
-
     ## Return results
     return(results)
   }
-
 
   evalfun_glmmtmb <- function(x) {
     simresid <- DHARMa::simulateResiduals(
@@ -137,7 +119,6 @@ test_that("Model summaries and evaluations returns expected results", {
     disp <- DHARMa::testDispersion(simresid, plot = FALSE)
     pdhess <- x$sdr$pdHess
 
-
     return(data.frame(
       unif = unif$p.value,
       disp = disp$p.value,
@@ -145,16 +126,14 @@ test_that("Model summaries and evaluations returns expected results", {
     ))
   }
 
-
-
   testsummary_glmmtmb <- seqwrap::seqwrap(
     fitting_fun = glmmTMB::glmmTMB,
-    arguments =
-      list(
-        formula = y ~ time +
+    arguments = list(
+      formula = y ~
+        time +
           (1 | participant),
-        family = glmmTMB::nbinom2
-      ),
+      family = glmmTMB::nbinom2
+    ),
     data = seqdatasubset,
     metadata = metadata,
     samplename = "seq_sample_id",
@@ -170,12 +149,12 @@ test_that("Model summaries and evaluations returns expected results", {
   )
 
   ## Expected output from summary/evaluation functions
-  expect_s3_class(testsummary_glmmtmb$summaries[[1]], "tbl")
-  expect_s3_class(testsummary_glmmtmb$evaluations[[1]], "data.frame")
+  expect_s3_class(testsummary_glmmtmb@summaries[[1]], "tbl")
+  expect_s3_class(testsummary_glmmtmb@evaluations[[1]], "data.frame")
 
   ## Expect no errors in the error data
-  expect_null(testsummary_glmmtmb$errors$err_sum[[1]])
-  expect_null(testsummary_glmmtmb$errors$err_eval[[1]])
+  expect_null(testsummary_glmmtmb@errors$err_sum[[1]])
+  expect_null(testsummary_glmmtmb@errors$err_eval[[1]])
 
   # Expect errors when a bad function is passed
   #

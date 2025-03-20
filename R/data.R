@@ -16,7 +16,6 @@
 "rna_seq_sample"
 
 
-
 #' Metadata to match the small RNA-seq data set used for illustrations
 #' in the vignette and testing.
 #'

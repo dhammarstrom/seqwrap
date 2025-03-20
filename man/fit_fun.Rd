@@ -14,3 +14,4 @@ fit_fun(fun, arg)
 \description{
 A function to fit models with a chosen fitting algorithm, used in seqwrap.
 }
+\keyword{internal}
