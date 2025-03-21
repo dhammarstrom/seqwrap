@@ -41,14 +41,16 @@ seqwrap_mtf <- function(
   save_mods,
   mod_path
 ) {
-  transposed <- data.frame(t(x))
+  # Extracting the specific target-specific data and transposing
+  transposed <- data.frame(t(x[[1]]))
   transposed$temp <- rownames(transposed)
   colnames(transposed)[ncol(transposed)] <- samp_name
   rownames(transposed) <- NULL
 
+  # Merging target-specific data with meta data
   df <- merge(transposed, data.frame(metdat), by = samp_name)
 
-  ## Keep only data needed for fitting
+  # Keep only data needed for fitting
   if ("formula" %in% names(arg_list)) {
     parsed <- all.vars(as.formula(arg_list$formula))
   }
@@ -62,7 +64,7 @@ seqwrap_mtf <- function(
     )
   }
 
-  ## Keep also additional variables that exists in the meta data data set
+  # Keep also additional variables that exists in the meta data data set
   if (!is.null(add_vars)) parsed <- c(parsed, add_vars)
 
   df <- df[, parsed, drop = FALSE]
@@ -76,6 +78,10 @@ seqwrap_mtf <- function(
       environment(arguments_final[[i]]) <- NULL
     }
   }
+
+  # Making target-wise data available
+  # for the model fitting algorithm.
+  if (!is.null(x[[2]])) list2env(x[[2]],envir = environment())
 
   # Add warning/errors to outputs
   warn <- NULL

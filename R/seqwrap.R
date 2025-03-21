@@ -182,6 +182,10 @@ seqwrap_compose <- function(
       if (!is.null(samplename)) colnames(xdata)[1] <- samplename
     }
 
+
+
+
+
     # Prepare metadata from DGEList
 
     xmetadata <- data.frame(

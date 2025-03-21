@@ -2,9 +2,7 @@
 % Please edit documentation in R/seqwrap.R
 \name{seqwrap_compose}
 \alias{seqwrap_compose}
-\title{Compose a swcontainer object for use in the seqwrap function. This function
-makes it possible to run checks on combined data sets (meta data and target
-data) and fitting functions to avoid issues in iterative modelling.}
+\title{Compose a swcontainer object for use in the seqwrap function.}
 \usage{
 seqwrap_compose(
   x,
@@ -70,7 +68,7 @@ Defaults to FALSE.}
 A swcontainer object for direct use in seqwrap.
 }
 \description{
-Compose a swcontainer object for use in the seqwrap function. This function
-makes it possible to run checks on combined data sets (meta data and target
-data) and fitting functions to avoid issues in iterative modelling.
+This function makes it possible to run checks on combined data sets
+(meta data and target data) and fitting functions to avoid issues
+in iterative modelling.
 }

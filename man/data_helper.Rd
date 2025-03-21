@@ -4,10 +4,17 @@
 \alias{data_helper}
 \title{Data helper function.}
 \usage{
-data_helper(dat, rownames = FALSE)
+data_helper(dat, targetdat = NULL, rownames = FALSE)
 }
 \arguments{
-\item{dat}{Target-wise data, either a data frame or a named list.}
+\item{dat}{Sample/target-wise data, either a data frame or a named list.}
+
+\item{targetdat, }{target-wise data, e.g. targe-wise dispersion}
+}
+\value{
+A list of lists, each element of the list has a target specific
+data frame over all samples and a target-specific data frame with values
+specific to target.
 }
 \description{
 The function takes a named list of data frames
