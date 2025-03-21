@@ -27,4 +27,4 @@ Suggests:
     glmmTMB,
     lme4
 Config/testthat/edition: 3
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
